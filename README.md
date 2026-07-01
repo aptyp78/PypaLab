@@ -26,8 +26,11 @@ hardware you own.
 | Model | Cluster | Method | Throughput | Notes |
 |---|---|---|---|---|
 | DeepSeek-V3.1 671B (8-bit) | 2× Apple M3 Ultra 512 GB | pipeline-parallel (MLX ring, 10 GbE) | **13.8 tok/s** decode · ~95 tok/s prefill | coherent output, data stayed on-prem |
+| DeepSeek-V4-Flash (FP8, 149 GB) | 2× NVIDIA GB10 | tensor-parallel-2 (vLLM) + MTP | **~17.4 tok/s** decode · TTFT 0.89 s | FP8 KV cache, speculative decoding |
 
 Full method and raw numbers in [`benchmarks/RESULTS.md`](benchmarks/RESULTS.md).
+Two stacks, two write-ups: [Apple Silicon / MLX](recipes/distributed-671b-apple-silicon.md)
+and [NVIDIA GB10 / vLLM](docs/sparks-deepseek-v4-vllm.md).
 
 ## Repository map
 

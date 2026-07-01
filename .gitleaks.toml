@@ -30,11 +30,19 @@ regex = '''\b(VLESS|REALITY)\b'''
 tags = ["vpn"]
 
 [allowlist]
-description = "Placeholders and public loopback are allowed"
+description = "Placeholders, loopback, and the guard's own rule-definition files"
 regexes = [
   '''NODE_[AB]_IP''',
   '''<SECRET_NAME>''',
   '''gpu-node-\d''',
   '''127\.0\.0\.1''',
   '''0\.0\.0\.0''',
+]
+# The files that DEFINE the detection rules legitimately quote the patterns they
+# detect — exclude them from scanning (they carry no real secrets).
+paths = [
+  '''VALIDATION\.md''',
+  '''CONTRIBUTING\.md''',
+  '''\.gitleaks\.toml''',
+  '''scripts/check-no-secrets\.sh''',
 ]
