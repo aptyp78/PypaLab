@@ -1,0 +1,40 @@
+# gitleaks config for PypaLab. Extends the default ruleset with fleet-specific
+# sensitive patterns. Any match fails CI (VALIDATION.md §1).
+title = "PypaLab gitleaks"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "pypalab-internal-ipv4"
+description = "Internal / private IPv4 address"
+regex = '''\b(192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[01])\.\d{1,3}\.\d{1,3})\b'''
+tags = ["network", "internal"]
+
+[[rules]]
+id = "pypalab-tailscale-ip"
+description = "Tailscale CGNAT IP"
+regex = '''\b100\.(6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b'''
+tags = ["network", "tailscale"]
+
+[[rules]]
+id = "pypalab-keychain"
+description = "macOS Keychain access pattern"
+regex = '''security find-generic-password'''
+tags = ["secret", "keychain"]
+
+[[rules]]
+id = "pypalab-vpn"
+description = "VPN protocol material"
+regex = '''\b(VLESS|REALITY)\b'''
+tags = ["vpn"]
+
+[allowlist]
+description = "Placeholders and public loopback are allowed"
+regexes = [
+  '''NODE_[AB]_IP''',
+  '''<SECRET_NAME>''',
+  '''gpu-node-\d''',
+  '''127\.0\.0\.1''',
+  '''0\.0\.0\.0''',
+]

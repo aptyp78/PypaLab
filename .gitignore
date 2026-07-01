@@ -1,0 +1,31 @@
+# Private overlay — real cluster access, NEVER committed
+hosts.json
+hosts.*.json
+*.local.*
+private/
+secrets/
+.env
+.env.*
+
+# Model weights & large artifacts
+*.safetensors
+*.gguf
+models/
+*.mlx
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+
+# OS / editor
+.DS_Store
+*.swp
+node_modules/
+
+# Logs & scratch
+*.log
+scratch/

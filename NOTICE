@@ -1,0 +1,6 @@
+PypaLab — heterogeneous distributed inference lab
+Copyright 2026 Arthur Ocheretny (@aptyp78)
+
+Licensed under the Apache License, Version 2.0.
+This product includes software developed for running frontier LLMs
+across heterogeneous Apple Silicon (MLX) and NVIDIA (CUDA) clusters.
