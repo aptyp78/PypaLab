@@ -27,10 +27,20 @@ in one 128 GB node → split across two via tensor-parallel.
 - Native **FP8** weights (e4m3, block 128×128) + FP8 KV cache
 - 1 MTP (multi-token-prediction) layer, context up to 262144
 
-## Launch (vLLM, both nodes)
+## Launch (Docker + systemd, both nodes)
 
-Identical command on both nodes; only `--node-rank` and `--headless` (on the
-worker) differ. Real IPs live in your private overlay — placeholders here:
+Not a bare/manual vLLM process — it runs in **Docker under systemd**:
+
+- systemd unit `ds4-vllm.service` (`Restart=on-failure`, `Requires=docker.service`,
+  `TimeoutStartSec=1200`) invokes `/usr/local/bin/ds4-serve.sh <node-rank>` on each
+  node (rank 0 = master + API, rank 1 = headless worker).
+- Docker image: a GB10-specialized vLLM build, run with
+  `--network host --ipc host --gpus all --privileged --cap-add=IPC_LOCK
+  --ulimit memlock=-1 --device=/dev/infiniband`, HF cache mounted from the host.
+- vLLM runs in the foreground inside the container so systemd can restart it.
+
+The effective vLLM invocation (identical on both nodes; only `--node-rank` and
+`--headless` on the worker differ; real IPs live in your private overlay):
 
 ```bash
 vllm serve deepseek-ai/DeepSeek-V4-Flash --served-model-name ChatGPTN \
@@ -65,12 +75,22 @@ vllm serve deepseek-ai/DeepSeek-V4-Flash --served-model-name ChatGPTN \
 `--max-num-seqs 8` enables continuous batching, so aggregate throughput under load
 is higher than single-stream.
 
-## Known optimization headroom
+## Interconnect: how the two planes split
 
-Inter-node tensor-parallel traffic currently rides the **ordinary LAN**, not the
-**QSFP56 200G** link — the fast fabric sits idle for inference. Pointing
-NCCL at the QSFP subnet is an untapped speedup. (Observed: dozens of established
-connections on the LAN subnet, ~1 idle on QSFP.)
+This is the core of the speed and easy to misread. The two subnets do **different
+jobs**:
+
+- **QSFP56 200G — data plane (RDMA).** The heavy NCCL all-reduce between the two
+  GPUs runs over QSFP56 via **RoCE/RDMA** (`NCCL_IB_HCA=rocep1s0f0`,
+  `--device=/dev/infiniband`). This low-latency fabric is *what makes TP-2 fast* —
+  it is not idle.
+- **Ordinary LAN — control plane only.** `NCCL_SOCKET_IFNAME` / `GLOO_SOCKET_IFNAME`
+  point at the LAN NIC, used only for bootstrap/rendezvous (master-port 25000) and
+  Gloo control.
+
+Why a naive `ss`/`netstat` misleads: you see many TCP connections on the LAN
+(that's control) and almost nothing on QSFP — because RDMA traffic bypasses the
+kernel TCP stack entirely. Don't conclude "QSFP is idle" from socket counts.
 
 ## Contrast with the Apple-Silicon path
 
