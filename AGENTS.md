@@ -51,9 +51,14 @@ cross-vendor-verifies hypotheses into a graph+vector store.
   `submit_finding(claim=…, verdict=…)`. Reachable on the compute node
   (`127.0.0.1:11092`), and mirrored as thin proxies on the assistant bot's MCP.
   A session without that MCP configured cannot see the agent — wire it in first.
+- **Client tag keeps projects from mixing:** any project may be a client. Pass
+  `requester` = your project's OWN stable slug (`artel`, `ecp12`, `pypalab`, …) —
+  always the same one, never another's. It scopes provenance, gate-refutations,
+  and which crystals you pull back. Full protocol:
+  `research/governance/CLIENT_PROTOCOL.md`.
 - **Two epistemic classes, never mixed:** `frontier-hypothesis`
   (verdict real/uncertain) is the agent's own candidate synthesis;
-  `artel-gate-verified` (green/red) is ground truth under *your* deterministic
+  `*-gate-verified` (green/red) is ground truth under *your* deterministic
   gate. Don't launder one into the other.
 - **Give back:** if your own gate verifies something, push it with
   `submit_finding` so the graph gets your ground truth. Same contract as rule 4.
