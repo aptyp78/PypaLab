@@ -12,6 +12,7 @@ all_sum deadlock that sinks tensor-parallel MoE on ring backends. Only the local
 half of the model is materialized on each node, so a model too big for one node
 still fits across the pool.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -62,8 +63,8 @@ def main() -> None:
         {"trust_remote_code": True},
         eos_token_ids=config.get("eos_token_id", None),
     )
-    model.model.pipeline(group)          # nulls non-local layers
-    mx.eval(model.parameters())          # materializes only this rank's layers
+    model.model.pipeline(group)  # nulls non-local layers
+    mx.eval(model.parameters())  # materializes only this rank's layers
     mx.eval(mx.distributed.all_sum(mx.array(1.0), stream=mx.cpu))  # barrier
     load_s = time.time() - t0
     rprint(f"[load] sharded + loaded in {load_s:.1f}s")
