@@ -42,6 +42,7 @@ and [NVIDIA GB10 / vLLM](docs/sparks-deepseek-v4-vllm.md).
 | [`benchmarks/`](benchmarks/) | Measurements + methodology (honest numbers, repeatable) |
 | [`docs/`](docs/) | Engineering write-ups (debugging detectives, performance studies) |
 | [`scripts/`](scripts/) | Validation & tooling that mirrors CI |
+| `research/` | **Private submodule** ([`pypalab-scientist`](https://github.com/aptyp78/pypalab-scientist)) — the autonomous research agent (НМА). Access-controlled; public clones see an empty gitlink. |
 
 ## Quick start
 
