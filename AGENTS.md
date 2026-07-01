@@ -36,6 +36,27 @@ running frontier LLMs on our own metal. Repo: `github.com/aptyp78/PypaLab`.
 | Engine bug + fix | `patches/` |
 | Numbers | `benchmarks/RESULTS.md` |
 | The full rulebook | `VALIDATION.md` |
+| Consult the frontier scientist (live) | `research/` submodule + "Consulting the scientist" below |
+
+## Consulting the scientist (live)
+
+`research/` is not just code — it's a **live, queryable research agent** (private
+submodule `pypalab-scientist`). Before you burn tokens re-deriving an AI/ML
+frontier question (an optimizer, an architecture trick, a distributed-inference
+pitfall), **ask it**. It monitors specialist sources, synthesizes, and
+cross-vendor-verifies hypotheses into a graph+vector store.
+
+- **Interface:** a FastMCP server exposing `research_status` /
+  `research_intel(query=…)` / `research_request(zone=…, requester=…)` /
+  `submit_finding(claim=…, verdict=…)`. Reachable on the compute node
+  (`127.0.0.1:11092`), and mirrored as thin proxies on the assistant bot's MCP.
+  A session without that MCP configured cannot see the agent — wire it in first.
+- **Two epistemic classes, never mixed:** `frontier-hypothesis`
+  (verdict real/uncertain) is the agent's own candidate synthesis;
+  `artel-gate-verified` (green/red) is ground truth under *your* deterministic
+  gate. Don't launder one into the other.
+- **Give back:** if your own gate verifies something, push it with
+  `submit_finding` so the graph gets your ground truth. Same contract as rule 4.
 
 ## When you improve a cluster
 
